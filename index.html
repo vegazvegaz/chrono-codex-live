@@ -142,15 +142,15 @@
                 </div>
                 <div class="bento-card" style="grid-column: span 2;">
                     <div class="bento-aura" style="background: var(--accent-pink);"></div>
-                    <span class="bento-emoji">🕰️</span><span class="bento-label">7 derniers j.</span><div class="bento-val" style="color:var(--accent-pink);">18.2h</div>
+                    <span class="bento-emoji">🕰️</span><span class="bento-label">7 derniers j.</span><div class="bento-val" style="color:var(--accent-pink);">–</div>
                 </div>
                 <div class="bento-card" style="grid-column: span 2;">
                     <div class="bento-aura" style="background: #FFFFFF;"></div>
-                    <span class="bento-emoji">⏪</span><span class="bento-label">Hier</span><div class="bento-val">3.2h</div>
+                    <span class="bento-emoji">⏪</span><span class="bento-label">Hier</span><div class="bento-val">–</div>
                 </div>
                 <div class="bento-card" style="grid-column: span 2;">
                     <div class="bento-aura" style="background: var(--accent-blue);"></div>
-                    <span class="bento-emoji">⏰</span><span class="bento-label">Aujourd'hui</span><div class="bento-val" style="color:var(--accent-blue);">1.2h</div>
+                    <span class="bento-emoji">⏰</span><span class="bento-label">Aujourd'hui</span><div class="bento-val" style="color:var(--accent-blue);">–</div>
                 </div>
             </div>
 
@@ -178,7 +178,7 @@
             <div class="insight-card">
                 <div style="display:flex; justify-content:space-between; align-items:baseline;">
                     <span class="bento-label">Temps de jeu total</span>
-                    <span style="font-size:11px; font-weight:800; color:var(--accent-pink); background:rgba(255,75,125,0.1); padding:4px 8px; border-radius:6px;" id="rollingTotal">TOTAL : 18.2H</span>
+                    <span style="font-size:11px; font-weight:800; color:var(--accent-pink); background:rgba(255,75,125,0.1); padding:4px 8px; border-radius:6px;" id="rollingTotal">TOTAL : –</span>
                 </div>
                 <div class="week-chart" id="rollingChart"></div>
             </div>
@@ -215,29 +215,100 @@
     </nav></div>
 
     <script>
-        let gamesData = [];
+        // Données statiques basées sur ta liste (DSX retiré)
+        const gamesData = [
+            { name: "ELDEN RING", hours: 132.6, appid: 1245620, color: "#ffaa00", dev: "FromSoftware", rel: 2022, comp: 90, desc: "Devenez Seigneur d'Elden dans un action-RPG en monde ouvert." },
+            { name: "Hades II", hours: 65.0, appid: 1145350, color: "#00ffcc", dev: "Supergiant Games", rel: 2024, comp: 60, desc: "Rogue-like nerveux et stylé dans les Enfers." },
+            { name: "Path of Exile 2", hours: 52.0, appid: 2694490, color: "#009966", dev: "Grinding Gear Games", rel: 2024, comp: 40, desc: "Hack'n slash dark et ultra profond." },
+            { name: "Hollow Knight", hours: 43.6, appid: 367520, color: "#2b4c7e", dev: "Team Cherry", rel: 2017, comp: 80, desc: "Metroidvania exigeant dans un monde d'insectes." },
+            { name: "FANTASY LIFE i: The Girl Who Steals Time", hours: 37.4, appid: 2993780, color: "#4caf50", dev: "LEVEL-5", rel: 2024, comp: 30, desc: "RPG de vie et d'aventure plein de métiers et d'activités." },
+            { name: "Ghost of Tsushima DIRECTOR'S CUT", hours: 30.0, appid: 2215430, color: "#c0392b", dev: "Sucker Punch Productions", rel: 2024, comp: 50, desc: "Réinvention cinématographique du Japon féodal." },
+            { name: "Red Dead Redemption 2", hours: 27.8, appid: 1174180, color: "#cc0000", dev: "Rockstar Games", rel: 2018, comp: 100, desc: "Western épique en monde ouvert." },
+            { name: "ELDEN RING NIGHTREIGN", hours: 24.3, appid: 2622380, color: "#996600", dev: "FromSoftware", rel: 2025, comp: 20, desc: "Nouvel arc sombre dans l'univers d'Elden Ring." },
+            { name: "Monster Hunter Wilds", hours: 22.3, appid: 2246340, color: "#3e8e41", dev: "CAPCOM", rel: 2025, comp: 25, desc: "Chasse aux monstres spectaculaire en environnement dynamique." },
+            { name: "DEATH STRANDING DIRECTOR'S CUT", hours: 20.8, appid: 1850570, color: "#34495e", dev: "Kojima Productions", rel: 2022, comp: 50, desc: "Livraisons et liens humains dans un monde fracturé." },
+            { name: "WUCHANG: Fallen Feathers", hours: 19.3, appid: 2277560, color: "#7f8c8d", dev: "Leenzee Games", rel: 2024, comp: 30, desc: "Action-RPG sombre inspiré des mythes chinois." },
+            { name: "The Rogue Prince of Persia", hours: 16.6, appid: 2717880, color: "#d35400", dev: "Evil Empire", rel: 2024, comp: 35, desc: "Action rogue-lite dans l'univers de Prince of Persia." },
+            { name: "Death's Door", hours: 15.3, appid: 894020, color: "#2c3e50", dev: "Acid Nerve", rel: 2021, comp: 90, desc: "Action-aventure mélancolique au rythme serré." },
+            { name: "CrossCode", hours: 13.6, appid: 368340, color: "#45b1e8", dev: "Radical Fish Games", rel: 2018, comp: 70, desc: "Action-RPG rétro néo-futuriste." },
+            { name: "Pyrene", hours: 13.4, appid: 2468100, color: "#8e44ad", dev: "Two Tiny Dice", rel: 2024, comp: 30, desc: "Deckbuilder tactique dans un monde mystérieux." },
+            { name: "Last Epoch", hours: 13.3, appid: 899770, color: "#9b59b6", dev: "Eleventh Hour Games", rel: 2024, comp: 40, desc: "Action-RPG looter centré sur les classes et timelines." },
+            { name: "Vampire Survivors", hours: 13.3, appid: 1794680, color: "#8e0000", dev: "poncle", rel: 2022, comp: 60, desc: "Shooter auto minimaliste et addictif." },
+            { name: "ARC Raiders", hours: 13.3, appid: 1808500, color: "#16a085", dev: "Embark Studios", rel: 2024, comp: 20, desc: "Coop sci-fi contre des machines colossales." },
+            { name: "Windblown", hours: 13.0, appid: 1911610, color: "#1abc9c", dev: "Motion Twin", rel: 2025, comp: 25, desc: "Action-rogue rapide et aérien." },
+            { name: "Cult of the Lamb", hours: 12.4, appid: 1313140, color: "#e74c3c", dev: "Massive Monster", rel: 2022, comp: 70, desc: "Mélange de gestion de culte et d'action." },
+            { name: "Balatro", hours: 12.1, appid: 2379780, color: "#f39c12", dev: "LocalThunk", rel: 2024, comp: 40, desc: "Poker roguelike ultra inventif." },
+            { name: "Halls of Torment", hours: 11.8, appid: 2218750, color: "#c0392b", dev: "Chasing Carrots", rel: 2023, comp: 30, desc: "Action survie inspirée des hack'n slash classiques." },
+            { name: "OVIS LOOP", hours: 9.4, appid: 2226730, color: "#27ae60", dev: "Studio inconnu", rel: 2024, comp: 20, desc: "Titre expérimental à la boucle intrigante." },
+            { name: "Lords of the Fallen", hours: 9.2, appid: 1501750, color: "#6a0dad", dev: "HEXWORKS", rel: 2023, comp: 80, desc: "Action-RPG dark fantasy exigeant." },
+            { name: "He is Coming", hours: 8.3, appid: 2824490, color: "#7f8c8d", dev: "Studio inconnu", rel: 2024, comp: 10, desc: "Expérience narrative mystérieuse." },
+            { name: "Baldur's Gate 3", hours: 7.0, appid: 1086940, color: "#9b59b6", dev: "Larian Studios", rel: 2023, comp: 20, desc: "CRPG massif basé sur Donjons & Dragons." },
+            { name: "No Rest for the Wicked", hours: 6.3, appid: 1371980, color: "#34495e", dev: "Moon Studios", rel: 2024, comp: 20, desc: "Action-RPG sombre avec focus sur les combats." },
+            { name: "Deep Rock Galactic: Survivor", hours: 5.9, appid: 2321470, color: "#16a085", dev: "Funday Games", rel: 2024, comp: 25, desc: "Spin-off survivor-like coop de Deep Rock Galactic." },
+            { name: "Anger Foot", hours: 5.6, appid: 1978590, color: "#f1c40f", dev: "Free Lives", rel: 2024, comp: 30, desc: "FPS arcade frénétique à base de coups de pied." },
+            { name: "Clair Obscur: Expedition 33", hours: 5.5, appid: 1903340, color: "#2980b9", dev: "Sandfall Interactive", rel: 2025, comp: 10, desc: "JRPG inspiré de la peinture impressionniste." },
+            { name: "NieR:Automata™", hours: 5.3, appid: 524220, color: "#95a5a6", dev: "PlatinumGames", rel: 2017, comp: 50, desc: "Action-RPG philosophique sur fond d'androïdes." },
+            { name: "Soulstone Survivors", hours: 5.2, appid: 2066020, color: "#8e44ad", dev: "Game Smithing Limited", rel: 2022, comp: 40, desc: "Survivor-like axé builds et compétences." },
+            { name: "Blue Fire", hours: 5.2, appid: 1220150, color: "#3498db", dev: "ROBİI Studios", rel: 2021, comp: 30, desc: "Plateformer 3D nerveux et atmosphérique." },
+            { name: "Lorelei and the Laser Eyes", hours: 5.0, appid: 2008920, color: "#e74c3c", dev: "Simogo", rel: 2024, comp: 20, desc: "Puzzle narratif mystérieux et stylisé." },
+            { name: "Blue Prince", hours: 4.7, appid: 1569580, color: "#2980b9", dev: "Dogubomb", rel: 2024, comp: 15, desc: "Exploration d'un manoir généré procéduralement." },
+            { name: "Maniac", hours: 4.6, appid: 1482380, color: "#e67e22", dev: "Studio inconnu", rel: 2024, comp: 15, desc: "Action frénétique à la mise en scène radicale." },
+            { name: "Pipistrello and the Cursed Yoyo", hours: 4.2, appid: 2870350, color: "#9b59b6", dev: "Studio inconnu", rel: 2025, comp: 25, desc: "Action-platformer original autour d'un yoyo maudit." },
+            { name: "Monsters are Coming! Rock & Road", hours: 4.0, appid: 2934220, color: "#2ecc71", dev: "Studio inconnu", rel: 2024, comp: 20, desc: "Course et défense contre des hordes de monstres." },
+            { name: "Witchfire", hours: 4.0, appid: 3156770, color: "#8e44ad", dev: "The Astronauts", rel: 2024, comp: 20, desc: "FPS dark fantasy à la gunplay lourd." },
+            { name: "Megabonk", hours: 4.0, appid: 3405340, color: "#f1c40f", dev: "Studio inconnu", rel: 2025, comp: 10, desc: "Titre arcade à l'esthétique exagérée." },
+            { name: "Death Must Die", hours: 3.9, appid: 2334730, color: "#34495e", dev: "Realm Archive", rel: 2023, comp: 30, desc: "Survivor-like dans un univers dark fantasy." },
+            { name: "Netherworld Covenant", hours: 3.4, appid: 2735580, color: "#7f8c8d", dev: "Studio inconnu", rel: 2025, comp: 15, desc: "RPG mystérieux dans un monde d'outre-tombe." },
+            { name: "Black Myth: Wukong", hours: 3.0, appid: 2358720, color: "#e67e22", dev: "Game Science", rel: 2024, comp: 10, desc: "Action-RPG inspiré du Roi Singe." },
+            { name: "Sol Cesto", hours: 3.0, appid: 2738490, color: "#16a085", dev: "Studio inconnu", rel: 2025, comp: 10, desc: "Jeu expérimental à l'ambiance solaire." },
+            { name: "Blasphemous", hours: 2.9, appid: 774361, color: "#8e0000", dev: "The Game Kitchen", rel: 2019, comp: 50, desc: "Metroidvania brutal et religieux." },
+            { name: "UNCHARTED™: Legacy of Thieves Collection", hours: 2.8, appid: 1659420, color: "#2980b9", dev: "Naughty Dog", rel: 2022, comp: 30, desc: "Compilation d'aventures cinématographiques." },
+            { name: "The Last of Us™ Part I", hours: 2.5, appid: 1888930, color: "#2c3e50", dev: "Naughty Dog", rel: 2023, comp: 20, desc: "Chef-d'œuvre narratif post-apocalyptique." },
+            { name: "Blasphemous 2", hours: 2.3, appid: 2114740, color: "#c0392b", dev: "The Game Kitchen", rel: 2023, comp: 20, desc: "Suite encore plus riche et brutale." },
+            { name: "Absolum", hours: 2.1, appid: 1904480, color: "#9b59b6", dev: "Studio inconnu", rel: 2024, comp: 10, desc: "Aventure mystérieuse à la direction artistique marquée." },
+            { name: "What Remains of Edith Finch", hours: 1.9, appid: 501300, color: "#f39c12", dev: "Giant Sparrow", rel: 2017, comp: 90, desc: "Récit interactif poignant sur une famille maudite." },
+            { name: "Fallout 4", hours: 1.5, appid: 377160, color: "#27ae60", dev: "Bethesda Game Studios", rel: 2015, comp: 10, desc: "RPG post-apocalyptique en monde ouvert." },
+            { name: "Tactical Breach Wizards", hours: 1.5, appid: 1043810, color: "#2980b9", dev: "Suspicious Developments", rel: 2024, comp: 10, desc: "Tactique au tour par tour avec des sorciers tactiques." },
+            { name: "SUMMERHOUSE", hours: 1.5, appid: 2533960, color: "#f1c40f", dev: "Studio inconnu", rel: 2024, comp: 20, desc: "Jeu contemplatif de création de petites maisons." },
+            { name: "Astral Ascent", hours: 1.4, appid: 1280930, color: "#9b59b6", dev: "Hibernian Workshop", rel: 2023, comp: 20, desc: "Rogue-lite coloré au combat nerveux." },
+            { name: "StarVaders", hours: 1.4, appid: 2097570, color: "#8e44ad", dev: "Studio inconnu", rel: 2024, comp: 15, desc: "Deckbuilder spatial hybride." },
+            { name: "Slay the Spire", hours: 1.3, appid: 646570, color: "#e67e22", dev: "MegaCrit", rel: 2019, comp: 40, desc: "Deckbuilder roguelike culte." },
+            { name: "Remnant II", hours: 1.3, appid: 1282100, color: "#34495e", dev: "Gunfire Games", rel: 2023, comp: 10, desc: "TPS coop souls-like." },
+            { name: "The Surge 2", hours: 1.1, appid: 644830, color: "#16a085", dev: "Deck13", rel: 2019, comp: 10, desc: "Action-RPG SF avec démembrements ciblés." },
+            { name: "Left 4 Dead 2", hours: 1.1, appid: 550, color: "#27ae60", dev: "Valve", rel: 2009, comp: 30, desc: "Coop zombie frénétique." },
+            { name: "Little Nightmares", hours: 1.1, appid: 424840, color: "#f1c40f", dev: "Tarsier Studios", rel: 2017, comp: 40, desc: "Plateforme-horreur dark et onirique." }
+        ];
+
         let activePlatform = 'steam';
+
+        function appidToImg(appid) {
+            return `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appid}/library_600x900.jpg`;
+        }
 
         function openSheet(name) {
             const g = gamesData.find(x => x.name === name);
             if(!g) return;
             const rank = [...gamesData].sort((a,b) => b.hours - a.hours).findIndex(x => x.name === name) + 1;
-            document.getElementById('sh-img').src = g.img;
+            document.getElementById('sh-img').src = appidToImg(g.appid);
             document.getElementById('sh-title').innerText = g.name;
-            document.getElementById('sh-hours').innerText = g.hours.toFixed(0)+"h";
+            document.getElementById('sh-hours').innerText = g.hours.toFixed(1)+"h";
             document.getElementById('sh-rank').innerText = "#"+rank;
-            document.getElementById('sh-dev').innerText = g.dev;
-            document.getElementById('sh-rel').innerText = g.rel;
-            document.getElementById('sh-desc').innerText = g.desc;
-            document.getElementById('sh-comp-text').innerText = g.comp+"%";
-            document.getElementById('sh-comp-fill').style.width = g.comp+"%";
-            document.getElementById('sh-halo').style.setProperty('--sheet-color', g.color);
+            document.getElementById('sh-dev').innerText = g.dev || "–";
+            document.getElementById('sh-rel').innerText = g.rel || "–";
+            document.getElementById('sh-desc').innerText = g.desc || "";
+            document.getElementById('sh-comp-text').innerText = (g.comp || 0)+"%";
+            document.getElementById('sh-comp-fill').style.width = (g.comp || 0)+"%";
+            document.getElementById('sh-halo').style.setProperty('--sheet-color', g.color || "#FF4B7D");
             document.getElementById('sh-chips').innerHTML = '<span class="chip tag-steam">STEAM</span>';
             document.getElementById('sheet-overlay').style.display='block';
             setTimeout(()=>{document.getElementById('sheet-overlay').style.opacity='1'; document.getElementById('game-sheet').style.transform='translateY(0)';},10);
         }
 
-        function closeSheet() { document.getElementById('sheet-overlay').style.opacity='0'; document.getElementById('game-sheet').style.transform='translateY(100%)'; setTimeout(()=>document.getElementById('sheet-overlay').style.display='none',300); }
+        function closeSheet() { 
+            document.getElementById('sheet-overlay').style.opacity='0'; 
+            document.getElementById('game-sheet').style.transform='translateY(100%)'; 
+            setTimeout(()=>document.getElementById('sheet-overlay').style.display='none',300); 
+        }
 
         function togglePlatform(p) {
             activePlatform = p;
@@ -250,13 +321,27 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const sort = document.getElementById('sortSelect').value;
             let filtered = gamesData.filter(g => g.name.toLowerCase().includes(search));
-            filtered.sort((a,b) => (sort==='alpha'? a.name.localeCompare(b.name) : (sort==='launch'? b.last-a.last : b.hours-a.hours)));
+            filtered.sort((a,b) => 
+                sort==='alpha' ? a.name.localeCompare(b.name) :
+                sort==='launch' ? b.hours - a.hours : 
+                b.hours - a.hours
+            );
             const listHtml = filtered.map(game => {
                 const total = game.hours;
                 const rank = [...gamesData].sort((a,b) => b.hours - a.hours).findIndex(rg => rg.name === game.name) + 1;
                 const rankDisp = (rank <= 3) ? (rank === 1 ? '🏅' : (rank === 2 ? '🥈' : '🥉')) : '';
                 let tags = `<span class="chip tag-steam">STEAM</span>`;
-                return `<div class="game-row" onclick="openSheet('${game.name.replace(/'/g, "\\'")}')"><div class="row-poster"><img src="${game.img}"></div><div class="row-info"><div class="row-title">${game.name}</div><div>${tags}</div></div><div class="row-stats"><div class="row-playtime">${total.toFixed(0)}h</div><div class="row-rank">${rankDisp} #${rank}</div></div></div>`;
+                return `<div class="game-row" onclick="openSheet('${game.name.replace(/'/g, "\\'")}')">
+                    <div class="row-poster"><img src="${appidToImg(game.appid)}"></div>
+                    <div class="row-info">
+                        <div class="row-title">${game.name}</div>
+                        <div>${tags}</div>
+                    </div>
+                    <div class="row-stats">
+                        <div class="row-playtime">${total.toFixed(1)}h</div>
+                        <div class="row-rank">${rankDisp} #${rank}</div>
+                    </div>
+                </div>`;
             }).join('');
             document.getElementById('collection-list').innerHTML = listHtml;
         }
@@ -268,7 +353,11 @@
             const vals = [1.2, 4.5, 2.1, 0.8, 5.8, 0.6, 3.2]; 
             for(let i=0; i<7; i++) {
                 const hPerc = (vals[i] / 6) * 100;
-                html += `<div class="bar-container"><span class="bar-val">${vals[i]}h</span><div class="bar ${i>=4 && i<=5?'weekend':''}" style="height:${hPerc}%"></div><span style="font-size:8px; color:var(--text-dim); margin-top:4px;">${labels[i]}</span></div>`;
+                html += `<div class="bar-container">
+                    <span class="bar-val">${vals[i]}h</span>
+                    <div class="bar ${i>=4 && i<=5?'weekend':''}" style="height:${hPerc}%"></div>
+                    <span style="font-size:8px; color:var(--text-dim); margin-top:4px;">${labels[i]}</span>
+                </div>`;
             }
             container.innerHTML = html;
         }
@@ -276,7 +365,7 @@
         function updateAnalytics() {
             let sTotal = 0;
             gamesData.forEach(g => { sTotal += g.hours; });
-            document.getElementById('totalSteam').innerText = Math.round(sTotal) + "h";
+            document.getElementById('totalSteam').innerText = sTotal.toFixed(1) + "h";
         }
 
         function switchPage(id) { 
@@ -287,18 +376,18 @@
             if(id === 'apercu') setTimeout(renderRollingChart, 50);
         }
 
-        function renderFocusCardTemplate(g, label, dateStr) {
+        function renderFocusCardTemplate(g, label, extra) {
             const tags = '<span class="chip tag-steam">STEAM</span>';
             return `<div onclick="openSheet('${g.name.replace(/'/g, "\\'")}')" style="width:100%; display:flex; align-items:center; gap:20px; position:relative;">
-                <div class="focus-aura" style="--aura-color:${g.color}"></div>
-                <div class="focus-poster"><img src="${g.img}"></div>
+                <div class="focus-aura" style="--aura-color:${g.color || '#FF4B7D'}"></div>
+                <div class="focus-poster"><img src="${appidToImg(g.appid)}"></div>
                 <div class="focus-info">
-                    <span class="focus-label">${label}: ${dateStr}</span>
+                    <span class="focus-label">${label}${extra ? ': ' + extra : ''}</span>
                     <div class="focus-title">${g.name}</div>
                     <div>${tags}</div>
                 </div>
                 <div class="row-stats">
-                    <div class="row-playtime">${g.hours.toFixed(0)}h</div>
+                    <div class="row-playtime">${g.hours.toFixed(1)}h</div>
                 </div>
             </div>`;
         }
@@ -306,32 +395,38 @@
         function initUI() {
             if (!gamesData || gamesData.length === 0) return;
 
-            const chrono = [...gamesData].sort((a,b) => b.last - a.last);
-            const lastDate = new Date(chrono[0].last*1000).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-            
-            document.getElementById('current-focus').innerHTML = renderFocusCardTemplate(chrono[0], "DERNIÈRE SESSION", lastDate);
-            
-            document.getElementById('discover-list').innerHTML = chrono.slice(1, 5).map(game => {
+            // tri par heures décroissantes
+            const byHours = [...gamesData].sort((a,b) => b.hours - a.hours);
+
+            // Session active = jeu le plus récemment joué (ici on prend le plus haut en heures comme proxy)
+            const current = byHours[0];
+            document.getElementById('current-focus').innerHTML = renderFocusCardTemplate(current, "DERNIÈRE SESSION", "");
+
+            // Historique récent = quelques jeux suivants
+            document.getElementById('discover-list').innerHTML = byHours.slice(1, 6).map(game => {
                 let tagsG = `<span class="chip tag-steam">STEAM</span>`;
-                return `<div class="game-row" onclick="openSheet('${game.name.replace(/'/g, "\\'")}')"><div class="row-poster"><img src="${game.img}"></div><div class="row-info"><div class="row-title">${game.name}</div><div>${tagsG}</div></div><div class="row-stats"><div class="row-playtime">${game.hours.toFixed(0)}h</div></div></div>`;
+                return `<div class="game-row" onclick="openSheet('${game.name.replace(/'/g, "\\'")}')">
+                    <div class="row-poster"><img src="${appidToImg(game.appid)}"></div>
+                    <div class="row-info">
+                        <div class="row-title">${game.name}</div>
+                        <div>${tagsG}</div>
+                    </div>
+                    <div class="row-stats">
+                        <div class="row-playtime">${game.hours.toFixed(1)}h</div>
+                    </div>
+                </div>`;
             }).join('');
             
-            const best = [...gamesData].sort((a,b) => b.hours - a.hours)[0];
+            // Record = jeu le plus joué
+            const best = byHours[0];
             document.getElementById('return-focus').innerHTML = renderFocusCardTemplate(best, "VOTRE RECORD", "Tous temps");
             
-            updateCollectionUI(); renderRollingChart(); updateAnalytics();
+            updateCollectionUI(); 
+            renderRollingChart(); 
+            updateAnalytics();
         }
 
-        // Charger games.json puis initialiser l'UI
-        fetch('games.json')
-            .then(r => r.json())
-            .then(data => {
-                gamesData = data;
-                initUI();
-            })
-            .catch(err => {
-                console.error('Erreur de chargement de games.json', err);
-            });
+        initUI();
     </script>
 </body>
 </html>
