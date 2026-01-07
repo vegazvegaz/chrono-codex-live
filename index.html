@@ -215,24 +215,16 @@
     </nav></div>
 
     <script>
-        const gamesData = [
-            { name: "CrossCode", sH: 45, img: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/368340/library_600x900.jpg", last: 1767690000, color: "#45b1e8", dev: "Radical Fish Games", rel: 2018, comp: 85, desc: "Action-RPG rétro néo-futuriste." },
-            { name: "Red Dead Redemption 2", sH: 27.8, img: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/library_600x900.jpg", last: 1767500000, color: "#cc0000", dev: "Rockstar Games", rel: 2018, comp: 100, desc: "L'épopée sauvage ultime." },
-            { name: "ELDEN RING", sH: 132.6, img: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg", last: 1767600000, color: "#ffaa00", dev: "FromSoftware", rel: 2022, comp: 92, desc: "Devenez Seigneur d'Elden." },
-            { name: "Lords of the Fallen", sH: 9.2, img: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1501750/library_600x900.jpg", last: 1767580000, color: "#6a0dad", dev: "HEXWORKS", rel: 2023, comp: 100, desc: "Dark fantasy." },
-            { name: "Hades II", sH: 72, img: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1145350/library_600x900.jpg", last: 1767695000, color: "#00ffcc", dev: "Supergiant Games", rel: 2024, comp: 65, desc: "Défiez le Temps." },
-            { name: "MGS V: The Phantom Pain", sH: 121, img: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/287700/library_600x900.jpg", last: 1765000000, color: "#1b2c3a", dev: "Kojima Productions", rel: 2015, comp: 100, desc: "Infiltration ultime." }
-        ];
-
+        let gamesData = [];
         let activePlatform = 'steam';
 
         function openSheet(name) {
             const g = gamesData.find(x => x.name === name);
             if(!g) return;
-            const rank = [...gamesData].sort((a,b) => b.sH - a.sH).findIndex(x => x.name === name) + 1;
+            const rank = [...gamesData].sort((a,b) => b.hours - a.hours).findIndex(x => x.name === name) + 1;
             document.getElementById('sh-img').src = g.img;
             document.getElementById('sh-title').innerText = g.name;
-            document.getElementById('sh-hours').innerText = g.sH.toFixed(0)+"h";
+            document.getElementById('sh-hours').innerText = g.hours.toFixed(0)+"h";
             document.getElementById('sh-rank').innerText = "#"+rank;
             document.getElementById('sh-dev').innerText = g.dev;
             document.getElementById('sh-rel').innerText = g.rel;
@@ -258,10 +250,10 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const sort = document.getElementById('sortSelect').value;
             let filtered = gamesData.filter(g => g.name.toLowerCase().includes(search));
-            filtered.sort((a,b) => (sort==='alpha'? a.name.localeCompare(b.name) : (sort==='launch'? b.last-a.last : b.sH-a.sH)));
+            filtered.sort((a,b) => (sort==='alpha'? a.name.localeCompare(b.name) : (sort==='launch'? b.last-a.last : b.hours-a.hours)));
             const listHtml = filtered.map(game => {
-                const total = game.sH;
-                const rank = [...gamesData].sort((a,b) => b.sH - a.sH).findIndex(rg => rg.name === game.name) + 1;
+                const total = game.hours;
+                const rank = [...gamesData].sort((a,b) => b.hours - a.hours).findIndex(rg => rg.name === game.name) + 1;
                 const rankDisp = (rank <= 3) ? (rank === 1 ? '🏅' : (rank === 2 ? '🥈' : '🥉')) : '';
                 let tags = `<span class="chip tag-steam">STEAM</span>`;
                 return `<div class="game-row" onclick="openSheet('${game.name.replace(/'/g, "\\'")}')"><div class="row-poster"><img src="${game.img}"></div><div class="row-info"><div class="row-title">${game.name}</div><div>${tags}</div></div><div class="row-stats"><div class="row-playtime">${total.toFixed(0)}h</div><div class="row-rank">${rankDisp} #${rank}</div></div></div>`;
@@ -283,7 +275,7 @@
 
         function updateAnalytics() {
             let sTotal = 0;
-            gamesData.forEach(g => { sTotal += g.sH; });
+            gamesData.forEach(g => { sTotal += g.hours; });
             document.getElementById('totalSteam').innerText = Math.round(sTotal) + "h";
         }
 
@@ -306,12 +298,14 @@
                     <div>${tags}</div>
                 </div>
                 <div class="row-stats">
-                    <div class="row-playtime">${g.sH.toFixed(0)}h</div>
+                    <div class="row-playtime">${g.hours.toFixed(0)}h</div>
                 </div>
             </div>`;
         }
 
         function initUI() {
+            if (!gamesData || gamesData.length === 0) return;
+
             const chrono = [...gamesData].sort((a,b) => b.last - a.last);
             const lastDate = new Date(chrono[0].last*1000).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
             
@@ -319,15 +313,25 @@
             
             document.getElementById('discover-list').innerHTML = chrono.slice(1, 5).map(game => {
                 let tagsG = `<span class="chip tag-steam">STEAM</span>`;
-                return `<div class="game-row" onclick="openSheet('${game.name.replace(/'/g, "\\'")}')"><div class="row-poster"><img src="${game.img}"></div><div class="row-info"><div class="row-title">${game.name}</div><div>${tagsG}</div></div><div class="row-stats"><div class="row-playtime">${game.sH.toFixed(0)}h</div></div></div>`;
+                return `<div class="game-row" onclick="openSheet('${game.name.replace(/'/g, "\\'")}')"><div class="row-poster"><img src="${game.img}"></div><div class="row-info"><div class="row-title">${game.name}</div><div>${tagsG}</div></div><div class="row-stats"><div class="row-playtime">${game.hours.toFixed(0)}h</div></div></div>`;
             }).join('');
             
-            const best = [...gamesData].sort((a,b) => b.sH - a.sH)[0];
+            const best = [...gamesData].sort((a,b) => b.hours - a.hours)[0];
             document.getElementById('return-focus').innerHTML = renderFocusCardTemplate(best, "VOTRE RECORD", "Tous temps");
             
             updateCollectionUI(); renderRollingChart(); updateAnalytics();
         }
-        initUI();
+
+        // Charger games.json puis initialiser l'UI
+        fetch('games.json')
+            .then(r => r.json())
+            .then(data => {
+                gamesData = data;
+                initUI();
+            })
+            .catch(err => {
+                console.error('Erreur de chargement de games.json', err);
+            });
     </script>
 </body>
 </html>
